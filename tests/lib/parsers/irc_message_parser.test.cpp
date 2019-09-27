@@ -1,9 +1,9 @@
 #include <catch/catch.hpp>
 
-#include "lib/parsers/irc_message_parser.hpp"
+#include "lib/irc/parsers/irc_message_parser.hpp"
 
-using bot::lib::IrcMessage;
-using bot::lib::parsers::parse_irc_message;
+using bot::lib::irc::IrcMessage;
+using bot::lib::irc::parsers::parse_irc_message;
 
 SCENARIO( "Parsing raw IRC message", "[irc_message_parser]" )
 {

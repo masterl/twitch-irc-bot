@@ -10,7 +10,7 @@
 
 // clang-format off
 BOOST_FUSION_ADAPT_STRUCT(
-    bot::lib::IrcMessage,
+    bot::lib::irc::IrcMessage,
     ( std::string, prefix )
 )
 // clang-format on
@@ -50,7 +50,7 @@ namespace ascii = boost::spirit::ascii;
 // prefix      =  servername / ( nickname [ [ "!" user ] "@" host ] )
 
 template < typename Iterator >
-struct irc_message_parser : qi::grammar< Iterator, bot::lib::IrcMessage(), ascii::space_type >
+struct irc_message_parser : qi::grammar< Iterator, bot::lib::irc::IrcMessage(), ascii::space_type >
 {
     irc_message_parser()
         : irc_message_parser::base_type( start )
@@ -70,7 +70,7 @@ struct irc_message_parser : qi::grammar< Iterator, bot::lib::IrcMessage(), ascii
     }
 
     qi::rule< Iterator, std::string(), ascii::space_type > identifier;
-    qi::rule< Iterator, bot::lib::IrcMessage(), ascii::space_type > start;
+    qi::rule< Iterator, bot::lib::irc::IrcMessage(), ascii::space_type > start;
 };
 
 // template < typename Iterator >
@@ -95,7 +95,7 @@ struct irc_message_parser : qi::grammar< Iterator, bot::lib::IrcMessage(), ascii
 //     return r;
 // }
 
-namespace bot::lib::parsers
+namespace bot::lib::irc::parsers
 {
     IrcMessage parse_irc_message( std::string const &raw_message )
     {
@@ -130,4 +130,4 @@ namespace bot::lib::parsers
 
         return message;
     }
-} // namespace bot::lib::parsers
+} // namespace bot::lib::irc::parsers
