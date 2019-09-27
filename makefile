@@ -26,7 +26,7 @@ LIBDIR := -L/usr/lib
 CFLAGS := -Wall
 
 # Flags for the C++ compiler.
-CXXFLAGS := -Wall -std=c++14
+CXXFLAGS := -Wall -Wextra -std=c++17 -pedantic
 CXXFLAGS += -isystem $(PROJECT_ROOT)/vendor
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -40,8 +40,9 @@ CXXFLAGS += -isystem $(PROJECT_ROOT)/vendor
 #STACKTRACEFLAGS = -rdynamic
 #PTHREADFLAG = -lpthread
 
-#LINKFLAGS := -lboost_filesystem -lboost_system
+LINKFLAGS := -lpthread
 ifeq ($(MAKECMDGOALS),test)
+	CXXFLAGS += -include $(PROJECT_ROOT)/tests/common.hpp
 	TESTFLAGS :=
 endif
 
@@ -112,7 +113,7 @@ export CXXFLAGS
 export OBJDIR
 
 exec: rmexec allobjs FORCE | $(BINDIR)
-	$(MAIN_COMPILER) $(ALLOBJS) $(MAIN_FLAGS) -o $(BINDIR)/$(EXEC) $(LINKFLAGS)
+	$(MAIN_COMPILER) $(MAIN_FLAGS) $(ALLOBJS) -o $(BINDIR)/$(EXEC) $(LINKFLAGS)
 	@echo -e '=----------------------------------------------------='
 	@echo -e '=           executable generated/updated             ='
 	@echo -e '=           Executable: $(BINDIR)/$(EXEC)  \t\t     ='
