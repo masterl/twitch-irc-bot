@@ -7,7 +7,7 @@ using bot::lib::irc::parsers::parse_irc_message;
 
 SCENARIO( "Parsing raw IRC message", "[irc_message_parser]" )
 {
-    GIVEN( "A string containing a message like \":a 001 b :c\"" )
+    GIVEN( "A string containing the message \":tmi.twitch.tv 001 bigodationbot :Welcome, GLHF!\"" )
     {
         std::string const raw_irc_message{":tmi.twitch.tv 001 bigodationbot :Welcome, GLHF!\r\n"};
 
@@ -15,9 +15,73 @@ SCENARIO( "Parsing raw IRC message", "[irc_message_parser]" )
         {
             IrcMessage const message = parse_irc_message( raw_irc_message );
 
-            THEN( "returned message should contain a prefix" )
+            THEN( "returned message.prefix.name should contain the name" )
             {
-                REQUIRE( message.prefix == "tmi.twitch.tv" );
+                REQUIRE( message.prefix.name == "tmi.twitch.tv" );
+            }
+
+            THEN( "prefix user should be empty" )
+            {
+                REQUIRE( message.prefix.user == "" );
+            }
+
+            THEN( "prefix host should be empty" )
+            {
+                REQUIRE( message.prefix.host == "" );
+            }
+        }
+    }
+
+    GIVEN( "A string containing the message \":empix!empix@empix.tmi.twitch.tv PRIVMSG #bigodation "
+           ":@bigodation oi\"" )
+    {
+        std::string const raw_irc_message{
+            ":empix!someuser@host.tmi.twitch.tv PRIVMSG #bigodation :@bigodation oi\r\n"};
+
+        WHEN( "the parser is invoked" )
+        {
+            IrcMessage const message = parse_irc_message( raw_irc_message );
+
+            THEN( "prefix should contain name" )
+            {
+                REQUIRE( message.prefix.name == "empix" );
+            }
+
+            THEN( "prefix should contain the user" )
+            {
+                REQUIRE( message.prefix.user == "someuser" );
+            }
+
+            THEN( "prefix should contain the host" )
+            {
+                REQUIRE( message.prefix.host == "host.tmi.twitch.tv" );
+            }
+        }
+    }
+
+    GIVEN( "A string containing the message \":empix@empix.tmi.twitch.tv PRIVMSG #bigodation "
+           ":@bigodation oi\"" )
+    {
+        std::string const raw_irc_message{
+            ":empix@host.tmi.twitch.tv PRIVMSG #bigodation :@bigodation oi\r\n"};
+
+        WHEN( "the parser is invoked" )
+        {
+            IrcMessage const message = parse_irc_message( raw_irc_message );
+
+            THEN( "prefix should contain name" )
+            {
+                REQUIRE( message.prefix.name == "empix" );
+            }
+
+            THEN( "prefix should contain the user" )
+            {
+                REQUIRE( message.prefix.user == "" );
+            }
+
+            THEN( "prefix should contain the host" )
+            {
+                REQUIRE( message.prefix.host == "host.tmi.twitch.tv" );
             }
         }
     }
