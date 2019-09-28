@@ -3,17 +3,19 @@
 #include "lib/irc/parsers/irc_message_parser.hpp"
 
 using bot::lib::irc::IrcMessage;
-using bot::lib::irc::parsers::parse_irc_message;
+using bot::lib::irc::parsers::IrcParser;
 
-SCENARIO( "Parsing raw IRC message", "[irc_message_parser]" )
+SCENARIO( "Parsing prefix from raw IRC message", "[irc_message_parser][irc_message_prefix]" )
 {
+    IrcParser irc_parser;
+
     GIVEN( "A string containing the message \":tmi.twitch.tv 001 bigodationbot :Welcome, GLHF!\"" )
     {
         std::string const raw_irc_message{":tmi.twitch.tv 001 bigodationbot :Welcome, GLHF!\r\n"};
 
         WHEN( "the parser is invoked" )
         {
-            IrcMessage const message = parse_irc_message( raw_irc_message );
+            IrcMessage const message = irc_parser.parse_message( raw_irc_message );
 
             THEN( "returned message.prefix.name should contain the name" )
             {
@@ -40,7 +42,7 @@ SCENARIO( "Parsing raw IRC message", "[irc_message_parser]" )
 
         WHEN( "the parser is invoked" )
         {
-            IrcMessage const message = parse_irc_message( raw_irc_message );
+            IrcMessage const message = irc_parser.parse_message( raw_irc_message );
 
             THEN( "prefix should contain name" )
             {
@@ -67,7 +69,7 @@ SCENARIO( "Parsing raw IRC message", "[irc_message_parser]" )
 
         WHEN( "the parser is invoked" )
         {
-            IrcMessage const message = parse_irc_message( raw_irc_message );
+            IrcMessage const message = irc_parser.parse_message( raw_irc_message );
 
             THEN( "prefix should contain name" )
             {
@@ -91,7 +93,6 @@ SCENARIO( "Parsing raw IRC message", "[irc_message_parser]" )
 IRC doc: https://modern.ircdocs.horse/
 
 
-
   message     =  [ "@" tags SPACE ] [ ":" prefix SPACE ] command
                  [ params ] crlf
 
@@ -102,7 +103,7 @@ IRC doc: https://modern.ircdocs.horse/
   valuechar   =  <any octet except NUL, BELL, CR, LF, semicolon (`;`) and SPACE>
   vendor      =  hostname
 
-  prefix      =  servername / ( nickname [ [ "!" user ] "@" host ] )
+ => prefix      =  servername / ( nickname [ [ "!" user ] "@" host ] )
 
   command     =  1*letter / 3digit
 
