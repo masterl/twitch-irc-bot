@@ -15,6 +15,7 @@ namespace bot::lib::irc
         IrcPrefix prefix;
         std::string command;
         Middle middle;
+        std::string trailing;
     };
 } // namespace bot::lib::irc
 

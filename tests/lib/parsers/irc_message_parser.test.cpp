@@ -42,6 +42,11 @@ SCENARIO( "Parsing prefix from raw IRC message", "[irc_message_parser][irc_messa
                 REQUIRE( message.middle.size() == 1 );
                 REQUIRE( message.middle[0] == "bigodationbot" );
             }
+
+            THEN( "trailing should contain \"Welcome, GLHF!\"" )
+            {
+                REQUIRE( message.trailing == "Welcome, GLHF!" );
+            }
         }
     }
 
@@ -80,6 +85,11 @@ SCENARIO( "Parsing prefix from raw IRC message", "[irc_message_parser][irc_messa
                 REQUIRE( message.middle.size() == 1 );
                 REQUIRE( message.middle[0] == "#bigodation" );
             }
+
+            THEN( "trailing should contain \"@bigodation oi\"" )
+            {
+                REQUIRE( message.trailing == "@bigodation oi" );
+            }
         }
     }
 
@@ -117,6 +127,11 @@ SCENARIO( "Parsing prefix from raw IRC message", "[irc_message_parser][irc_messa
             {
                 REQUIRE( message.middle.size() == 1 );
                 REQUIRE( message.middle[0] == "#bigodation" );
+            }
+
+            THEN( "trailing should contain \"@bigodation oi\"" )
+            {
+                REQUIRE( message.trailing == "@bigodation oi" );
             }
         }
     }
@@ -157,6 +172,11 @@ SCENARIO( "Parsing prefix from raw IRC message", "[irc_message_parser][irc_messa
                 REQUIRE( message.middle[0] == "bigodationbot" );
                 REQUIRE( message.middle[1] == "=" );
                 REQUIRE( message.middle[2] == "#bigodation" );
+            }
+
+            THEN( "trailing should contain \"bigodationbot\"" )
+            {
+                REQUIRE( message.trailing == "bigodationbot" );
             }
         }
     }

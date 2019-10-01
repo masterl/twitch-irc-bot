@@ -17,7 +17,7 @@ namespace bot::lib::irc::parsers
         // necessary until we can no-skip spaces!
         --control.first;
 
-        result &= parse_irc_middle( control, message.middle );
+        result &= parse_irc_params( control, message );
 
         return message;
     }
@@ -61,6 +61,18 @@ namespace bot::lib::irc::parsers
         return r;
     }
 
+    bool IrcParser::parse_irc_params( ParserControl &control, IrcMessage &message )
+    {
+        if( parse_irc_middle( control, message.middle ) )
+        {
+            --control.first;
+
+            return parse_irc_trailing( control, message.trailing );
+        }
+
+        return true;
+    }
+
     bool IrcParser::parse_irc_middle( ParserControl &control, Middle &middle )
     {
         // params      =  *( SPACE middle ) [ SPACE ":" trailing ]
@@ -84,6 +96,37 @@ namespace bot::lib::irc::parsers
                             *(lit(':') | ~char_("\r\n: "))
                         ]
                     ][push_back(phoenix::ref(middle), _1)]
+                )
+            ),
+            space);
+        // clang-format on
+
+        return r;
+    }
+
+    bool IrcParser::parse_irc_trailing( ParserControl &control, std::string &trailing )
+    {
+        // params      =  *( SPACE middle ) [ SPACE ":" trailing ]
+        // nospcrlfcl  =  <any octet except NUL, CR, LF, colon (`:`) and SPACE>
+        // middle      =  nospcrlfcl *( ":" / nospcrlfcl )
+        // trailing    =  *( ":" / " " / nospcrlfcl )
+
+        using qi::no_skip;
+
+        // clang-format off
+        bool const r = phrase_parse(
+            control.first,
+            control.last,
+            (
+                -(
+                    no_skip[lit(' ')] >>
+                    lit(':') >>
+                    qi::as_string[
+                        no_skip[*(
+                            ~char_("\r\n")
+                            )
+                        ]
+                    ][phoenix::ref(trailing) = _1]
                 )
             ),
             space);
