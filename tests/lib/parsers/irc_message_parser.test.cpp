@@ -180,6 +180,69 @@ SCENARIO( "Parsing prefix from raw IRC message", "[irc_message_parser][irc_messa
             }
         }
     }
+
+    GIVEN( "A string containing the message "
+           "\"@a2-4a;campo=1;admin;hello=78 353\"" )
+    {
+        std::string const raw_irc_message{"@a2-4a;campo=1;admin;hello=78 353\r\n"};
+
+        WHEN( "the parser is invoked" )
+        {
+            IrcMessage const message = irc_parser.parse_message( raw_irc_message );
+
+            auto const not_on_map = message.tags.end();
+
+            THEN( "command should contain 353" )
+            {
+                REQUIRE( message.command == "353" );
+            }
+
+            THEN( "message.tags size should be 4" )
+            {
+                REQUIRE( message.tags.size() == 4 );
+            }
+
+            THEN( "message.tags should contain a2-4a" )
+            {
+                auto const item = message.tags.find( "a2-4a" );
+                REQUIRE( item != not_on_map );
+
+                auto const [key, value] = *item;
+
+                REQUIRE( value == "" );
+            }
+
+            THEN( "message.tags should contain campo" )
+            {
+                auto const item = message.tags.find( "campo" );
+                REQUIRE( item != not_on_map );
+
+                auto const [key, value] = *item;
+
+                REQUIRE( value == "1" );
+            }
+
+            THEN( "message.tags should contain admin" )
+            {
+                auto const item = message.tags.find( "admin" );
+                REQUIRE( item != not_on_map );
+
+                auto const [key, value] = *item;
+
+                REQUIRE( value == "" );
+            }
+
+            THEN( "message.tags should contain hello" )
+            {
+                auto const item = message.tags.find( "hello" );
+                REQUIRE( item != not_on_map );
+
+                auto const [key, value] = *item;
+
+                REQUIRE( value == "78" );
+            }
+        }
+    }
 }
 
 /*

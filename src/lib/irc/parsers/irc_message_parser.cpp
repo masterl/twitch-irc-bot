@@ -4,13 +4,50 @@
 
 namespace bot::lib::irc::parsers
 {
+    struct TagsBuilder
+    {
+        TagsBuilder( Tags &tags )
+            : tags{tags}
+        {
+        }
+
+        TagsBuilder( TagsBuilder &other )
+            : tags{other.tags}
+            , last_key_{other.last_key_}
+        {
+        }
+
+        TagsBuilder &operator<<( std::string new_key )
+        {
+            tags[new_key] = "";
+
+            last_key_ = new_key;
+
+            return *this;
+        }
+
+        TagsBuilder &operator=( std::string new_value )
+        {
+            tags[last_key_] = new_value;
+
+            return *this;
+        }
+
+        Tags &tags;
+
+        private:
+        std::string last_key_;
+    };
+
     IrcMessage IrcParser::parse_message( std::string const &raw_message )
     {
         IrcMessage message;
 
         ParserControl control{raw_message};
 
-        bool result = parse_irc_prefix( control, message.prefix );
+        bool result = parse_irc_tags( control, message.tags );
+
+        result &= parse_irc_prefix( control, message.prefix );
 
         result &= parse_irc_command( control, message.command );
 
@@ -20,6 +57,45 @@ namespace bot::lib::irc::parsers
         result &= parse_irc_params( control, message );
 
         return message;
+    }
+
+    bool IrcParser::parse_irc_tags( ParserControl &control, Tags &tags )
+    {
+        // ["@" tags SPACE]
+        // tags = tag * [";" tag]
+        // tag = key["=" value]
+        // key = [vendor "/"] 1 * ( ALPHA / DIGIT / "-" )
+        // value = *valuechar
+        // valuechar = < any octet except NUL, BELL, CR, LF, semicolon(`;`) and SPACE>
+        // vendor = hostname
+
+        TagsBuilder tags_builder{tags};
+
+        using qi::no_skip;
+
+        // clang-format off
+        bool const r = phrase_parse(
+            control.first,
+            control.last,
+            (
+                -(
+                    lit('@') >>
+                    (
+                        (
+                            qi::as_string[no_skip[+char_("-a-zA-Z0-9/")]][phoenix::ref(tags_builder) << _1] >>
+                            -(
+                                lit('=') >>
+                                qi::as_string[no_skip[*~char_("\a\r\n; ")]][phoenix::ref(tags_builder) = _1]
+                            )
+                        ) % ';'
+                    ) >>
+                    no_skip[lit(' ')]
+                )
+            ),
+            space);
+        // clang-format on
+
+        return r;
     }
 
     bool IrcParser::parse_irc_prefix( ParserControl &control, IrcPrefix &prefix )

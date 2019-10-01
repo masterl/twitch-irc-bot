@@ -57,6 +57,7 @@ namespace bot::lib::irc::parsers
         IrcMessage parse_message( std::string const &raw_message );
 
         private:
+        bool parse_irc_tags( ParserControl &control, Tags &tags );
         bool parse_irc_prefix( ParserControl &control, IrcPrefix &prefix );
         bool parse_irc_command( ParserControl &control, std::string &command );
         bool parse_irc_params( ParserControl &control, IrcMessage &message );
