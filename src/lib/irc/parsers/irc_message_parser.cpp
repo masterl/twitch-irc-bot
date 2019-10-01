@@ -6,26 +6,47 @@ namespace bot::lib::irc::parsers
     {
         IrcMessage message;
 
-        bool result = parse_irc_prefix( raw_message, message.prefix );
+        ParserControl control{raw_message};
+
+        bool result = parse_irc_prefix( control, message.prefix );
+
+        result &= parse_irc_command( control, message.command );
 
         return message;
     }
 
-    bool IrcParser::parse_irc_prefix( std::string const &message, IrcPrefix &prefix )
+    bool IrcParser::parse_irc_prefix( ParserControl &control, IrcPrefix &prefix )
     {
         // prefix      =  servername / ( nickname [ [ "!" user ] "@" host ] )
 
-        auto first{message.begin()};
-        auto const last{message.end()};
-
         // clang-format off
         bool const r = phrase_parse(
-            first,
-            last,
+            control.first,
+            control.last,
             (
                 lit(':') >> qi::as_string[lexeme[+~char_(" !@")]][phoenix::ref(prefix.name) = _1] >>
                 -(lit('!') >> qi::as_string[lexeme[+~char_(" !@")]][phoenix::ref(prefix.user) = _1]) >>
                 -(lit('@') >> qi::as_string[lexeme[+~char_(" !@")]][phoenix::ref(prefix.host) = _1])
+            ),
+            space );
+        // clang-format on
+
+        return r;
+    }
+
+    bool IrcParser::parse_irc_command( ParserControl &control, std::string &command )
+    {
+        // command     =  1*letter / 3digit
+
+        // clang-format off
+        bool const r = phrase_parse(
+            control.first,
+            control.last,
+            (
+                qi::as_string[
+                    lexeme[+char_("A-Z")] | repeat(3)[digit]
+                ]
+                [phoenix::ref(command) = _1]
             ),
             space );
         // clang-format on

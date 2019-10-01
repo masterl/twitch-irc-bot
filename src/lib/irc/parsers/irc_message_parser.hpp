@@ -6,6 +6,7 @@
 #include <boost/spirit/include/qi.hpp>
 
 #include "../IrcMessage.hpp"
+#include "ParserControl.hpp"
 
 namespace bot::lib::irc::parsers
 {
@@ -17,9 +18,11 @@ namespace bot::lib::irc::parsers
     using ascii::space;
     using qi::_1;
     using qi::char_;
+    using qi::digit;
     using qi::lexeme;
     using qi::lit;
     using qi::phrase_parse;
+    using qi::repeat;
 
     // template < typename Iterator >
     // struct prefix_parser : qi::grammar< Iterator, IrcPrefix(), ascii::space_type >
@@ -54,7 +57,8 @@ namespace bot::lib::irc::parsers
         IrcMessage parse_message( std::string const &raw_message );
 
         private:
-        bool parse_irc_prefix( std::string const &message, IrcPrefix &prefix );
+        bool parse_irc_prefix( ParserControl &control, IrcPrefix &prefix );
+        bool parse_irc_command( ParserControl &control, std::string &command );
     };
 } // namespace bot::lib::irc::parsers
 

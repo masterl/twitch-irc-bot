@@ -10,6 +10,7 @@ namespace bot::lib::irc
     struct IrcMessage
     {
         IrcPrefix prefix;
+        std::string command;
     };
 } // namespace bot::lib::irc
 

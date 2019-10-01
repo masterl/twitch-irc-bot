@@ -31,6 +31,11 @@ SCENARIO( "Parsing prefix from raw IRC message", "[irc_message_parser][irc_messa
             {
                 REQUIRE( message.prefix.host == "" );
             }
+
+            THEN( "command should contain 001" )
+            {
+                REQUIRE( message.command == "001" );
+            }
         }
     }
 
@@ -58,6 +63,11 @@ SCENARIO( "Parsing prefix from raw IRC message", "[irc_message_parser][irc_messa
             {
                 REQUIRE( message.prefix.host == "host.tmi.twitch.tv" );
             }
+
+            THEN( "command should contain PRIVMSG" )
+            {
+                REQUIRE( message.command == "PRIVMSG" );
+            }
         }
     }
 
@@ -84,6 +94,11 @@ SCENARIO( "Parsing prefix from raw IRC message", "[irc_message_parser][irc_messa
             THEN( "prefix should contain the host" )
             {
                 REQUIRE( message.prefix.host == "host.tmi.twitch.tv" );
+            }
+
+            THEN( "command should contain PRIVMSG" )
+            {
+                REQUIRE( message.command == "PRIVMSG" );
             }
         }
     }
