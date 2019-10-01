@@ -36,6 +36,12 @@ SCENARIO( "Parsing prefix from raw IRC message", "[irc_message_parser][irc_messa
             {
                 REQUIRE( message.command == "001" );
             }
+
+            THEN( "middle should contain [\"bigodationbot\"]" )
+            {
+                REQUIRE( message.middle.size() == 1 );
+                REQUIRE( message.middle[0] == "bigodationbot" );
+            }
         }
     }
 
@@ -68,6 +74,12 @@ SCENARIO( "Parsing prefix from raw IRC message", "[irc_message_parser][irc_messa
             {
                 REQUIRE( message.command == "PRIVMSG" );
             }
+
+            THEN( "middle should contain [\"#bigodation\"]" )
+            {
+                REQUIRE( message.middle.size() == 1 );
+                REQUIRE( message.middle[0] == "#bigodation" );
+            }
         }
     }
 
@@ -99,6 +111,52 @@ SCENARIO( "Parsing prefix from raw IRC message", "[irc_message_parser][irc_messa
             THEN( "command should contain PRIVMSG" )
             {
                 REQUIRE( message.command == "PRIVMSG" );
+            }
+
+            THEN( "middle should contain [\"#bigodation\"]" )
+            {
+                REQUIRE( message.middle.size() == 1 );
+                REQUIRE( message.middle[0] == "#bigodation" );
+            }
+        }
+    }
+
+    GIVEN( "A string containing the message \":bigodationbot.tmi.twitch.tv 353 bigodationbot = "
+           "#bigodation :bigodationbot\"" )
+    {
+        std::string const raw_irc_message{
+            ":bigodationbot.tmi.twitch.tv 353 bigodationbot = #bigodation :bigodationbot\r\n"};
+
+        WHEN( "the parser is invoked" )
+        {
+            IrcMessage const message = irc_parser.parse_message( raw_irc_message );
+
+            THEN( "prefix should contain name" )
+            {
+                REQUIRE( message.prefix.name == "bigodationbot.tmi.twitch.tv" );
+            }
+
+            THEN( "prefix should contain the user" )
+            {
+                REQUIRE( message.prefix.user == "" );
+            }
+
+            THEN( "prefix should contain the host" )
+            {
+                REQUIRE( message.prefix.host == "" );
+            }
+
+            THEN( "command should contain 353" )
+            {
+                REQUIRE( message.command == "353" );
+            }
+
+            THEN( "middle should contain [\"bigodationbot\"]" )
+            {
+                REQUIRE( message.middle.size() == 3 );
+                REQUIRE( message.middle[0] == "bigodationbot" );
+                REQUIRE( message.middle[1] == "=" );
+                REQUIRE( message.middle[2] == "#bigodation" );
             }
         }
     }

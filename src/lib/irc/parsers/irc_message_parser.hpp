@@ -59,6 +59,7 @@ namespace bot::lib::irc::parsers
         private:
         bool parse_irc_prefix( ParserControl &control, IrcPrefix &prefix );
         bool parse_irc_command( ParserControl &control, std::string &command );
+        bool parse_irc_middle( ParserControl &control, Middle &middle );
     };
 } // namespace bot::lib::irc::parsers
 
