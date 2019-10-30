@@ -36,9 +36,16 @@ class IrcClient
         wsocket_.close( websocket::close_code::normal );
     }
 
-    void send_message( std::string const &message )
+    void send_raw_irc_message( std::string const &message )
     {
         wsocket_.write( boost::asio::buffer( message ) );
+    }
+
+    void send_message( std::string const &channel, std::string const &message )
+    {
+        std::string const text = "PRIVMSG #" + channel + " :" + message + "\r\n";
+
+        send_raw_irc_message( text );
     }
 
     std::string read_messages()
@@ -46,6 +53,13 @@ class IrcClient
         wsocket_.read( buffer_ );
 
         return string_from_buffer();
+    }
+
+    void join_channel( std::string const &channel )
+    {
+        std::string const text = "JOIN #" + channel + "\r\n";
+
+        send_raw_irc_message( text );
     }
 
     private:
@@ -66,13 +80,13 @@ class IrcClient
     void send_bot_token( std::string const &token )
     {
         std::string const text = std::string( "PASS " ) + token + "\r\n";
-        send_message( text );
+        send_raw_irc_message( text );
     }
 
     void send_bot_name( std::string const &name )
     {
         std::string const text = std::string( "NICK " ) + name + "\r\n";
-        send_message( text );
+        send_raw_irc_message( text );
     }
 };
 
@@ -85,6 +99,16 @@ int main( int argc, char **argv )
                          getenv( "TWITCH_BOT_NICK" ),
                          getenv( "TWITCH_BOT_TOKEN" )};
 
+        std::cout << '[' << client.read_messages() << "]\n";
+
+        client.join_channel( "bigodation" );
+
+        std::cout << '[' << client.read_messages() << "]\n";
+
+        client.send_message( "bigodation", "Teste muito louco" );
+        client.send_message( "bigodation", "Wut" );
+
+        std::cout << '[' << client.read_messages() << "]\n";
         std::cout << '[' << client.read_messages() << "]\n";
 
         return 0;
